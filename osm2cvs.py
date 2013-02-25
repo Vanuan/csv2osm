@@ -10,12 +10,10 @@ def pnpoly(verts, test):
   verts - array of x, y pairs, test - pair of x, y
   '''
   c = False
-  j = len(verts) - 1
-  for i in range(len(verts)):
-    if ( ((verts[i][1]>test[1]) != (verts[j][1]>test[1])) and
-     (test[0] < (verts[j][0]-verts[i][0]) * (test[1]-verts[i][1]) / (verts[j][1]-verts[i][1]) + verts[i][1]) ):
-       c = not c
-    j = i - 1
+  for v0, v1 in zip(verts, [verts[-1]] + verts[:-1]):
+    if ((v0[1] > test[1]) != (v1[1] > test[1])):
+      if (test[0]) <= ((v1[0] - v0[0]) * (test[1] - v0[1]) / (v1[1] - v0[1]) + v0[0]):
+        c = not c
   return c
 
 

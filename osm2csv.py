@@ -21,12 +21,13 @@ class Filter(object):
   def should_keep(self, node):
     keep = False
     keep_conditions = [{'amenity': 'atm', 'operator': u'Укрсиббанк'},
+                       {'amenity': 'atm', 'operator': u'Euronet'},
                        {'amenity': 'bank', 'name': u'Укрсиббанк'}]
     for keep_condition in keep_conditions:
       temp_keep = True
       for key, value in keep_condition.iteritems():
         # all fields should be present
-        if key not in node or node[key] != value:
+        if key not in node or node[key].lower() != value.lower():
           temp_keep = False
       if temp_keep == True:  # we have a match
         keep = True
@@ -48,7 +49,7 @@ class OsmHandler(ContentHandler):
     self.__nodes = {}
     self.__selected_nodes = []
     self.__buildings = {}
-    self.__attr_names = ['id', 'lat', 'lon', TagNames.HOUSENUMBER, TagNames.STREET]
+    self.__attr_names = ['id', 'version', 'lat', 'lon', TagNames.HOUSENUMBER, TagNames.STREET]
     self.__node_filter = node_filter
 
   def get_nodes(self):
@@ -68,9 +69,10 @@ class OsmHandler(ContentHandler):
       self.__cur_node = {}
       attr_names = attrs.getNames()
       if 'lat' not in attr_names or 'lon' not in attr_names:
-        print 'not lat or lon found in node'
+        print 'not lat or lon found in node', attrs.getValue('id')
         sys.exit(-1)
       self.__cur_node['id'] = attrs.getValue('id')
+      self.__cur_node['version'] = attrs.getValue('version')
       self.__cur_node['lat'] = attrs.getValue('lat')
       self.__cur_node['lon'] = attrs.getValue('lon')
     if name == 'tag':
@@ -146,6 +148,10 @@ if __name__ == '__main__':
           if relation['type'] == 'associatedStreet':
             for relation_way in relation['ways']:
               if building['id'] == relation_way['id']:
+                if not 'name' in relation:
+                  print ('Error! There is no name in associated street',
+                         relation, 'for building', relation_way['id'])
+                  sys.exit(-1)
                 node[TagNames.STREET] = relation['name']
         break
 

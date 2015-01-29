@@ -30,7 +30,7 @@ def print_tags(row, lat, lon, valid_tags):
 
 if __name__ == '__main__':
   if len(sys.argv) != 2:
-    print 'usage: ', sys.agv[0], ' table.cvs'
+    print 'usage: ', sys.argv[0], ' table.cvs'
     sys.exit(-1)
 
   valid_tags = ['name',
